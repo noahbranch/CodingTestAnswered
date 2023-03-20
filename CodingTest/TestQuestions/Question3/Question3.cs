@@ -24,9 +24,7 @@ namespace CodingTest.TestQuestions.Question3
         /// <param name="svm"></param>
         public SiteEntity CreateSite(SiteViewModel svm)
         {
-            var zipCode = svm.ZipCode;
-
-            var taxRateByZip = _taxesRepository.GetRatesByZip(zipCode);
+            var taxRateByZip = _taxesRepository.GetRatesByZip(svm.ZipCode);
 
             if (taxRateByZip == null) {
                 throw new InvalidOperationException("Cannot find tax rate");
@@ -36,7 +34,13 @@ namespace CodingTest.TestQuestions.Question3
                 throw new InvalidOperationException("Site already exists!");
             }
 
-            throw new NotImplementedException();
+            var taxRateTotal = taxRateByZip.Sum(x => x.Rate);
+
+            var newSite = new SiteEntity(svm.SiteName, new Address {  City = svm.City, State = svm.State, Zip = svm.ZipCode}, taxRateTotal);
+
+            _repository.CreateSite(newSite);
+
+            return newSite;
         }
     }
 }
